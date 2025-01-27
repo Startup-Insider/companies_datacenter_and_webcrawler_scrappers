@@ -4,10 +4,10 @@ from curl_cffi import requests
 import time
 
 
-class DealRoomJsonHandler():
+class DealRoomJsonHandler:
 
-    def __init__(self):
-        self.csv_path = 'startup_map_berlin.csv'
+    def __init__(self,csv_path):
+        self.csv_path = csv_path
 
     def start_from_file(self, file_name):
         with open(f'berlin_files/{file_name}.json', 'r', encoding='utf-8') as f:
