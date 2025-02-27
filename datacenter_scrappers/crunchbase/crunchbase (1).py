@@ -14,7 +14,7 @@ import websocket  #  pip install websocket-client
 chrome_path = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
 url = 'https://www.crunchbase.com/discover/saved/companies-europe-since-2013-for-scraper/d0e6679a-15e5-4fd9-ab56-90c6c3774afb'
 
-csv_path = 'csv/crunchbase.csv'
+csv_path = 'crunchbase.csv'
 delay_time = 5
 
 # ----------------------------- variables that must be changed END
@@ -83,6 +83,9 @@ def on_message(ws, message):
 
 def on_error(ws, error):
     print(f"[function_on_error]: {error}")
+    print(f"Error type: {type(error)}")
+    print(f"Error details: {error}")
+    print(f"Error details: {repr(error)}")
 
 
 def on_close(ws, close_status_code, close_msg):
@@ -133,6 +136,9 @@ def click_next():
     global ws_tab
     js_code = """ 
 (function() { const element = document.querySelector('a[aria-label=\"Next\"]');
+if(!element){
+return {href:false,isDisabled:true};
+}
      const href = element.getAttribute('href'); 
      const isDisabled = element.hasAttribute('disabled'); 
     if(isDisabled !== true){
@@ -160,7 +166,11 @@ def json_to_csv(startup_data):
             continue
         unique_startup.add(st_name)
 
-        st_website = sd['properties']['website']['value']
+        try:
+            st_website = sd['properties']['website']['value']
+        except:
+            print("no website for " ,st_name)
+            st_website = "none"
         try:
             st_category_groups = ",".join([cg["value"] for cg in sd['properties']['category_groups']])
         except:
@@ -209,7 +219,8 @@ def drive_id_requests(message_json):
         if message_json['result']['result']['value']['isDisabled']:
             print("----  The last page has been reached.")
             stop_scraper = True
-        manage_url_write(f"https://www.crunchbase.com{message_json['result']['result']['value']['href']}")
+        if message_json['result']['result']['value']['href']:
+            manage_url_write(f"https://www.crunchbase.com{message_json['result']['result']['value']['href']}")
 
 
 # --------------------------------------------------function END -------------------------------------------------------
@@ -253,7 +264,7 @@ def create_new_csv():
 # --------------------------------------------------function END -------------------------------------------------------
 
 
-manage_url_read()
+# manage_url_read() // to start from memorised url
 error_text = """\nERROR CONNECT TO BROWSER, PLEASE CLOSE ALL CHROME WINDOWS AND TRY AGAIN
 [ when the scraper starting, no Chrome windows should be open ]."""
 
@@ -286,12 +297,46 @@ thread.start()
 
 time.sleep(0.6)
 
+url = input("Enter the start url: ")
+
 ws_tab.send(json.dumps({"id": 1, "method": "Fetch.enable", "params": {"patterns": [{"requestStage": "Response"}]}}))
 ws_tab.send(json.dumps({
     "id": 2,
     "method": "Page.navigate",
     "params": {"url": url}
 }))
+
+time.sleep(10)
+
+js_code_login = """ 
+(function() { 
+const emailInput = document.querySelector('input[name="email"]');
+
+if(emailInput){
+emailInput.value = 'jan.thomas@startup-insider.com';
+emailInput.dispatchEvent(new Event('input'));
+
+const passwordInput = document.querySelector('input[name="password"]');
+passwordInput.value = 'm&Cg5GTSeC2Kq!u';
+passwordInput.dispatchEvent(new Event('input'));
+
+setTimeout(() => {
+    const loginButton = document.querySelector("button.login");
+    loginButton.click();
+}, 1000); 
+}}
+)()
+"""
+ws_tab.send(json.dumps({
+        "id": 445,
+        "method": "Runtime.evaluate",
+        "params": {
+            "expression": js_code_login,
+            "returnByValue": True
+        }
+ }))
+
+
 
 floating_url = None
 count_while = 0
