@@ -6,7 +6,7 @@ COPY copyables /
 
 # Update packages, install essential dependencies, and clean up
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \run command
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     supervisor \
 	xvfb  \
