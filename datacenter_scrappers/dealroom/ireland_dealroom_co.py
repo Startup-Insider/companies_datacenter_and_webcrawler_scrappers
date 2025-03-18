@@ -68,7 +68,7 @@ def items_on_page(data):
                        f"{item['launch_month']}-{item['launch_year']}",
                        f"{item['latest_valuation_enhanced']['valuation_min']} - {item['latest_valuation_enhanced']['valuation_max']}"
                        ])
-    with open('csv/ireland_dealroom_co.csv', mode='a', newline='', encoding='utf-8') as file:
+    with open('ireland_dealroom_co.csv', mode='a', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerows(to_csv)
 
@@ -148,7 +148,7 @@ def api_request(offset):
 #---------------------------------------------------------------------------------------
 
 
-with open('csv/ireland_dealroom_co.csv', 'w', newline='', encoding='utf-8') as f:
+with open('ireland_dealroom_co.csv', 'w', newline='', encoding='utf-8') as f:
     writer = csv.writer(f)
     writer.writerow(["name", "industries", "sub_industries", "type", "website", "location","signal","grouth","launch Date","valuation"])
 
