@@ -6,7 +6,7 @@ import sys
 from dealroom_module import DealRoomJsonHandler
 
 proxy_data = 'http://username:password@host:port'
-parser = DealRoomJsonHandler()
+parser = DealRoomJsonHandler('start_map_berlin.csv')
 
 
 #---------------------------------------------------------------------------------------
