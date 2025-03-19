@@ -3,10 +3,8 @@ import json
 import time
 import csv
 import sys
-from dealroom_module import DealRoomJsonHandler
 
 proxy_data = 'http://username:password@host:port'
-parser = DealRoomJsonHandler('ireland_dealroom.csv')
 def get_single_company(company_id):
     global proxy_data
     headers = {
@@ -47,30 +45,54 @@ def get_single_company(company_id):
 
 #---------------------------------------------------------------------------------------
 
-def items_on_page(data, first_loop=False):
-    global parser
-    parser.main_function(data, first_loop)
+def items_on_page(data):
+    to_csv = []
+    for item in data['items']:
+        # result_industries = result_sub_industries = result_income_streams = website = 'none'
+        industries = [item_ind['name'] for item_ind in item['industries']]
+        result_industries = ', '.join(industries)
+
+        sub_industries = [item_sub_ind['name'] for item_sub_ind in item['sub_industries']]
+        result_sub_industries = ', '.join(sub_industries)
+
+        income_streams = [inc_stream['name'] for inc_stream in item['income_streams']]
+
+        revenues = [rev['name'] for rev in item['revenues']]
+
+        result_income_streams = ', '.join(income_streams + revenues)
+        website = get_single_company(item['path'])
+        to_csv.append([item['name'], result_industries, result_sub_industries, result_income_streams, website,
+                       item['hq_locations'][0]['address'],
+                       item['startup_ranking_rating'],
+                       item['employee_6_months_growth_relative'],
+                       f"{item['launch_month']}-{item['launch_year']}",
+                       f"{item['latest_valuation_enhanced']['valuation_min']} - {item['latest_valuation_enhanced']['valuation_max']}"
+                       ])
+    with open('ireland_dealroom_co.csv', mode='a', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        writer.writerows(to_csv)
+
 
 #---------------------------------------------------------------------------------------
 def api_request(offset):
     global proxy_data
     headers = {
-        'accept': 'application/json, text/plain, */*',
+        'accept': '*/*',
         'accept-language': 'en-US,en;q=0.9,ru;q=0.8',
+        'authorization': 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjR5RXVHSXRVcThZYkRSUVpUVDVoOCJ9.eyJodHRwczovL2RlYWxyb29tLmNvL3VzZXJfdXVpZCI6IjI4N2ZlN2I1LTFlZTYtNGRiNC04ZDk2LWMxYzc2MzcxYzY2OSIsImh0dHBzOi8vZGVhbHJvb20uY28vcm9sZXMiOlsic3RhbmRhcmQiXSwiaHR0cHM6Ly9kZWFscm9vbS5jby9lbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaHR0cHM6Ly9kZWFscm9vbS5jby9pc19zb2NpYWwiOnRydWUsImlzcyI6Imh0dHBzOi8vYWNjb3VudHMuZGVhbHJvb20uY28vIiwic3ViIjoibGlua2VkaW58cjZYTGNEdks1SiIsImF1ZCI6WyJodHRwczovL2FwaS5kZWFscm9vbS5jby9hcGkvdjIiLCJodHRwczovL2RlYWxyb29tLXByb2R1Y3Rpb24uZXUuYXV0aDAuY29tL3VzZXJpbmZvIl0sImlhdCI6MTcyODU4ODQ5MSwiZXhwIjoxNzI4Njc0ODkxLCJzY29wZSI6Im9wZW5pZCIsImF6cCI6IjJiUzhYT3NjQXpwbDdnSVlPRzFlNURodWZmNU84Z3QzIiwicGVybWlzc2lvbnMiOltdfQ.EsebFPdxtotrzW4eNlez3cQ7tY1DVXA8pjgaqaEMrzZ5ZSqdajJxqWKiskh56tFQ3sCR3zWrNEtZMMt3BSKfmnHi7EvA6XBjtb9rW4KvE_ZiManDDw1JAf5CgZqTyNeRocNdl8wN5aLMVwc-4up1p8MGz8Sl3Sw6f4ZVn4tzyLPyIbVFyQgaJrUauZba_QZJpc1iUGMRWUzdFSYY02tYIUputNGACyu45Ii4JtB1E6-V3fM86pD-dW609qZaAjxnQG1kb4Xx2ysIp-Ape6xWQSoG_lk_Gs6tMG1VTBYB1qD5bl4OR7Mq6uOrdc2QyonhXmsQPs-vJDtfKNxSNl2Dww',
         'content-type': 'application/json',
-        'origin': 'https://ireland.dealroom.co',
+        'origin': 'https://ireland.dealroom.co', #differ_from
         'priority': 'u=1, i',
-        'referer': 'https://ireland.dealroom.co/',
-        'sec-ch-ua': '"Not A(Brand";v="8", "Chromium";v="132", "Google Chrome";v="132"',
+        'referer': 'https://ireland.dealroom.co/', #differ_from
+        'sec-ch-ua': '"Google Chrome";v="129", "Not=A?Brand";v="8", "Chromium";v="129"',
         'sec-ch-ua-mobile': '?0',
         'sec-ch-ua-platform': '"Windows"',
         'sec-fetch-dest': 'empty',
         'sec-fetch-mode': 'cors',
         'sec-fetch-site': 'same-site',
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36',
-        'x-dealroom-app-id': '060623092',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
+        'x-dealroom-app-id': '060623092', #differ_from
         'x-requested-with': 'XMLHttpRequest',
-        'x-unsafe-url-referrer': 'https://ireland.dealroom.co/companies/f/company_status/not_closed/founding_or_hq_slug_locations/anyof_ireland_~northern_ireland~?sort=-startup_ranking_rating',
     }
 
     json_data = {
@@ -119,9 +141,6 @@ def api_request(offset):
                              headers=headers, json=json_data)
     # print(response.text)
 
-
-    print(response)
-
     data = response.json()
     return data
 
@@ -129,9 +148,9 @@ def api_request(offset):
 #---------------------------------------------------------------------------------------
 
 
-# with open('ireland_dealroom_co.csv', 'w', newline='', encoding='utf-8') as f:
-#     writer = csv.writer(f)
-#     writer.writerow(["name", "industries", "sub_industries", "type", "website", "location","signal","grouth","launch Date","valuation"])
+with open('ireland_dealroom_co.csv', 'w', newline='', encoding='utf-8') as f:
+    writer = csv.writer(f)
+    writer.writerow(["name", "industries", "sub_industries", "type", "website", "location","signal","grouth","launch Date","valuation"])
 
 data = api_request(0)
 
@@ -146,12 +165,10 @@ except:
 
 
 print(f'TOTAL COMPANIES {total_companies}')
-items_on_page(data,True)
-
-time.sleep(3.5)
+items_on_page(data)
 
 for i in range(25, total_companies, 25):
-    data = api_request(i)
+    data = api_request(0)
     items_on_page(data)
     print(f'-----------------------------DONE {i}/{total_companies}')
     time.sleep(2.5)

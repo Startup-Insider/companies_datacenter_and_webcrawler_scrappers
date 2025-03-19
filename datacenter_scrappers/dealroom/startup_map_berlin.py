@@ -9,43 +9,6 @@ proxy_data = 'http://username:password@host:port'
 parser = DealRoomJsonHandler('start_map_berlin.csv')
 
 
-def get_single_company(company_id):
-    global proxy_data
-    headers = {
-        'accept': '*/*',
-        'accept-language': 'en-US,en;q=0.9,ru;q=0.8',
-        'content-type': 'application/json',
-        'origin': 'https://startup-map.berlin',
-        'priority': 'u=1, i',
-        'referer': 'https://startup-map.berlin/',
-        'sec-ch-ua': '"Google Chrome";v="129", "Not=A?Brand";v="8", "Chromium";v="129"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"Windows"',
-        'sec-fetch-dest': 'empty',
-        'sec-fetch-mode': 'cors',
-        'sec-fetch-site': 'cross-site',
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
-        'x-dealroom-app-id': '110618058',
-        'x-requested-with': 'XMLHttpRequest',
-    }
-
-    proxies = {
-        'http': proxy_data,
-        'https': proxy_data
-    }
-
-    response = requests.get(
-        f'https://api.dealroom.co/api/v2/entities/{company_id}?fields=about,about_ai_generated,affiliated_funds,appstore_app_id,can_edit,career_page_url,client_focus,closing_month,closing_year,company_status,corporate_industries,country_experience,current_and_prev_year_fundings_num,delivery_method,employees_chart,employees_latest,employee_12_months_growth_percentile,employee_12_months_growth_unique,similarweb_12_months_growth_percentile,similarweb_12_months_growth_unique,employees,entity_sub_types,exits_higher_800m,facebook_url,fundings_investor,growth_stage,hq_locations,uuid,images(100x100),income_streams,industries,industry_experience,innovations_count,investments_higher_800m,investments_num,investments,investor_exits_funding_enhanced,investor_exits_num,investor_total_rank,investor_total,investors,is_ai_data,is_editorial,is_government,is_non_profit,is_from_traderegister,job_offers_total,kpi_summary,landscapes,latest_valuation_enhanced,launch_month,launch_year,legal_entities,linkedin_url,lists_ids,lists,lp_investments,lp_investors,name,ownerships,patents_count,path,playmarket_app_id,revenues,rounds_experience,sdgs,service_industries,share_ticker_symbol,similarweb_chart,similarweb_hidden,sub_industries,tagline,tags,team_total,tech_stack,technologies,total_funding_enhanced,traffic(top_countries,visitors,sources),twitter_url,instagram_handle,type,website_url&limit=25&offset=0',
-        headers=headers,
-        # proxies=proxies,
-        impersonate="chrome101",
-    )
-    single_data = response.json()
-
-    print(f'requesting {company_id}')
-    return single_data['website_url']
-
-
 #---------------------------------------------------------------------------------------
 
 def items_on_page(data, first_loop=False):
@@ -75,7 +38,7 @@ def api_request(offset):
     }
 
     json_data = {
-        'fields': 'uuid,appstore_app_id,client_focus,company_status,corporate_industries,employees_chart,employees_latest,'
+        'fields': 'uuid,website_url,appstore_app_id,client_focus,company_status,corporate_industries,employees_chart,employees_latest,'
                   'employees,entity_sub_types,employee_12_months_growth_percentile,employee_12_months_growth_unique,similarweb_12_months_growth_percentile,'
                   'similarweb_12_months_growth_unique,similarweb_12_months_growth_delta,similarweb_12_months_growth_relative,similarweb_3_months_growth_delta,'
                   'similarweb_3_months_growth_percentile,similarweb_3_months_growth_relative,similarweb_3_months_growth_unique,similarweb_6_months_growth_delta,'
@@ -146,6 +109,8 @@ def api_request(offset):
                              impersonate="chrome101",
                              headers=headers, json=json_data)
     # print(response.text)
+
+    print("response: ", response)
 
     data = response.json()
     return data

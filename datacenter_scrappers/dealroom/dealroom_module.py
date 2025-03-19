@@ -235,6 +235,7 @@ class DealRoomJsonHandler:
         for item in json_data['items']:
             company_data = {
                 "Name": item['name'],
+                "website": item["website_url"],
                 "Dealroom signal": item['startup_ranking_rating'],
                 "Market": self.colMarket(item['client_focus'], item['industries'], item['sub_industries']),
                 "Type": self.colType(item['technologies'], item['income_streams'], item['revenues']),
@@ -266,6 +267,7 @@ class DealRoomJsonHandler:
                 "IPO DATE": self.colIpoDate(item.get("ipo_round", "{}")),
                 "Logo Image": item['images']['74x74'],
                 "tagline": item['tagline'],
+                
                 # "website": self.startup_website(item['path'])
             }
             if first_loop:

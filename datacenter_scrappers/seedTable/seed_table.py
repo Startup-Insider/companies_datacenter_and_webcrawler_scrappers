@@ -6,7 +6,7 @@ import os
 import sys
 import json
 
-csv_path = 'csv/seedTable.csv'
+csv_path = 'seedTable.csv'
 
 work_path = '/'.join(csv_path.split('/')[:-1])
 if len(work_path) > 0:
