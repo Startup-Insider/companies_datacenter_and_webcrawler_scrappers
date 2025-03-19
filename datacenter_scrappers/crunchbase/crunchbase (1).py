@@ -264,7 +264,7 @@ def create_new_csv():
 # --------------------------------------------------function END -------------------------------------------------------
 
 
-# manage_url_read() // to start from memorised url
+manage_url_read() # to start from memorised url
 error_text = """\nERROR CONNECT TO BROWSER, PLEASE CLOSE ALL CHROME WINDOWS AND TRY AGAIN
 [ when the scraper starting, no Chrome windows should be open ]."""
 
@@ -297,7 +297,7 @@ thread.start()
 
 time.sleep(0.6)
 
-url = input("Enter the start url: ")
+# url = input("Enter the start url: ")
 
 ws_tab.send(json.dumps({"id": 1, "method": "Fetch.enable", "params": {"patterns": [{"requestStage": "Response"}]}}))
 ws_tab.send(json.dumps({
